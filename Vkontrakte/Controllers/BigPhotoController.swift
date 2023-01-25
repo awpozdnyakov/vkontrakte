@@ -93,7 +93,7 @@ class BigPhotoController: UIViewController {
                         self.additionalImageView.transform = CGAffineTransform(translationX: -1.5*self.additionalImageView.bounds.width, y: 200).concatenating(CGAffineTransform(scaleX: 1.2, y: 1.2))
                     case .current:
                         break
-                    @unknown default:
+                    default:
                         break
                     }
                 }
@@ -123,12 +123,15 @@ class BigPhotoController: UIViewController {
                         self.additionalImageView.transform = CGAffineTransform(translationX:  1.5*self.additionalImageView.bounds.width, y: 200).concatenating(CGAffineTransform(scaleX: 1.2, y: 1.2))
                     case .current:
                         break
-                    @unknown default:
+                    default:
                         break
                     }
                 }
             }
         case .changed:
+            
+            guard let propertyAnimator = self.propertyAnimator else {return}
+            
             switch animationDirection {
             case .right:
                 let percent = min(max(0, panGestureRecognizer.translation(in: view).x/200), 1)
@@ -138,13 +141,16 @@ class BigPhotoController: UIViewController {
                 propertyAnimator.fractionComplete = percent
             }
         case .ended:
+            
+            guard let propertyAnimator = self.propertyAnimator else {return}
+            
             if propertyAnimator.fractionComplete > 0.33 {
                 propertyAnimator.continueAnimation(withTimingParameters: nil, durationFactor: 0.5)
             } else {
                 propertyAnimator.isReversed = true
                 propertyAnimator.continueAnimation(withTimingParameters: nil, durationFactor: 0.5)
             }
-        @unknown default:
+        default:
             break
         }
         

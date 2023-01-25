@@ -6,72 +6,48 @@
 //
 
 import UIKit
+import Alamofire
+import SDWebImage
+
+
 
 class FriendsController: UITableViewController {
     
+    let session = Session.shared
+    let service = Service()
     
-    let friends = [
-        Friend(image: UIImage.init(named: "dron_ava"),
-               name: "Ilya Dronov",
-               photos: [UIImage(named: "dron_1")!,
-                        UIImage(named: "dron_2")!,
-                        UIImage(named: "dron_3")!,
-                        UIImage(named: "dron_4")!,
-                        UIImage(named: "dron_5")!]),
-        Friend(image: UIImage.init(named: "kar_ava"),
-               name: "Karandash",
-               photos: [UIImage(named: "kar_1")!,
-                        UIImage(named: "kar_2")!,
-                        UIImage(named: "kar_3")!,
-                        UIImage(named: "kar_4")!,
-                        UIImage(named: "kar_5")!]),
-        Friend(image: UIImage.init(named: "andr_ava"),
-               name: "Andrew Pozdnyakov",
-               photos: [UIImage(named: "andr_1")!,
-                        UIImage(named: "andr_2")!,
-                        UIImage(named: "andr_3")!,
-                        UIImage(named: "andr_4")!,
-                        UIImage(named: "andr_5")!]),
-        Friend(image: UIImage.init(named: "chir_ava"),
-               name: "Alex Chirkov",
-               photos: [UIImage(named: "chir_1")!,
-                        UIImage(named: "chir_2")!,
-                        UIImage(named: "chir_3")!,
-                        UIImage(named: "chir_4")!,
-                        UIImage(named: "chir_5")!]),
-        Friend(image: UIImage.init(named: "nat_ava"),
-               name: "Nata Li",
-               photos: [UIImage(named: "nat_1")!,
-                        UIImage(named: "nat_2")!,
-                        UIImage(named: "nat_3")!,
-                        UIImage(named: "nat_4")!,
-                        UIImage(named: "nat_5")!])
-    ]
-    
+    var friends = [Friend]()
     var sortedFriends = [Character: [Friend]]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.sortedFriends = sort(friends: friends)
+        service.getFriends(token: session.token) {
+            friends in
+            self.friends = friends
+            self.sortedFriends = self.sort(friends: friends)
+            self.tableView.reloadData()
+
+            
+        }
     }
 
         
     private func sort(friends: [Friend]) -> [Character: [Friend]] {
-        
+
         var friendsDict = [Character: [Friend]]()
-        
+
         friends.forEach() {friend in
-            
+
             guard let firstChar = friend.name.first else {return}
-           
+
             if var thisCharFriends = friendsDict[firstChar] {
                 thisCharFriends.append(friend)
                 friendsDict[firstChar] = thisCharFriends
             } else {
                 friendsDict[firstChar] = [friend]
             }
-            
+
         }
         return friendsDict
     }
@@ -102,11 +78,14 @@ class FriendsController: UITableViewController {
         
         let firstChar = sortedFriends.keys.sorted()[indexPath.section]
         let friends = sortedFriends[firstChar]!
+
+        let friend = friends[indexPath.row]
+        cell.labelFriendsCell?.text = friend.name + " " + friend.surname
+
+        if let photo = friend.photo{
+            cell.imageFriendsCell.sd_setImage(with: URL(string: photo))
+        }
         
-        let friend: Friend = friends[indexPath.row]
-        
-        cell.imageFriendsCell.image = friend.image
-        cell.labelFriendsCell.text = friend.name
 
         return cell
     }
@@ -126,12 +105,48 @@ class FriendsController: UITableViewController {
             let friends = sortedFriends[firstChar]!
             let friend: Friend = friends[indexPath.row]
             
-            destinationVC.friendsImage = friend.photos
-            destinationVC.title = friend.name
+            destinationVC.title = friend.name + " " + friend.surname
         }
         
     }
     
 }
 
-     
+
+
+//extension FriendsController {
+//
+//    func getFriends(completion: @escaping ((Result <Friend, Error>) -> ())) {
+//
+//        var urlComponents = URLComponents()
+//        urlComponents.scheme = "https"
+//        urlComponents.host = "api.vk.com"
+//        urlComponents.path = "/method/friends.get"
+//        urlComponents.queryItems = [
+//            URLQueryItem(name: "user_id", value: String(Session.shared.userID)),
+//            URLQueryItem(name: "access_token", value: Session.shared.token),
+//            URLQueryItem(name: "v", value: "5.131")
+//        ]
+//
+//        guard let url = urlComponents.url else { return }
+//
+//        let request = URLRequest(url: url)
+//
+//        URLSession.shared.dataTask(with: request) { data, response, error in
+//            if let error = error {
+//                print(error)
+//            }
+//            guard let data = data else {
+//                return
+//            }
+//            let decoder = JSONDecoder()
+//            do {
+//                let result = try decoder.decode(Friend.self, from: data)
+//                completion(.success(result))
+//            } catch {
+//                print(error)
+//            }
+//        }.resume()
+//    }
+//}
+

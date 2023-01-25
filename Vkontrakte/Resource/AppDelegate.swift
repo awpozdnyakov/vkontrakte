@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,7 +14,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+       
+//        let item = Entity()
+//        item.id = 0
+//        item.name = "Андрей"
+//        item.lastName = "Поздняков"
+//        do{
+////            let config = Realm.Configuration(deleteRealmIfMigrationNeeded: true)
+////            let realm = try Realm(configuration: config)
+//            let realm = try Realm()
+//            print(realm.configuration.fileURL)
+//            realm.beginWrite()
+//            realm.add(item)
+//            try realm.commitWrite()
+//        } catch {
+//            print(error)
+//            
+//        }
+        
         return true
     }
 

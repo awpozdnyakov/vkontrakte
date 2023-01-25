@@ -2,19 +2,52 @@
 //  Friends.swift
 //  Vkontrakte
 //
-//  Created by Andrey Pozdnyakov on 03.11.2022.
+//  Created by Andrey Pozdnyakov on 06.01.2023.
 //
 
-import UIKit
+import Foundation
 
-class Friend {
-    let image: UIImage?
-    let name: String
-    var photos: [UIImage] = []
+
+
+//Friends
+struct ResponseFriends: Decodable{
+    var response: Friends
+}
+
+struct Friends: Decodable{
+    var items: [Friend]
+}
+
+struct Friend: Decodable{
+    var id: Int
+    var photo: String?
+    var name: String
+    var surname: String
     
-    init(image: UIImage? = nil, name: String, photos: [UIImage]) {
-        self.image = image
-        self.name = name
-        self.photos = photos
+    enum CodingKeys: String, CodingKey {
+        case id
+        case photo = "photo_50"
+        case name = "first_name"
+        case surname = "last_name"
+        
     }
+
+}
+
+
+//FriendsPhoto
+struct ResponsePhotos: Decodable{
+    var response: Photos
+}
+
+struct Photos: Decodable{
+    var items: [Photo]
+}
+
+struct Photo: Decodable{
+    var sizez: [Size]?
+}
+
+struct Size: Decodable{
+    var url: String?
 }

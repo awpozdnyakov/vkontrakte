@@ -6,18 +6,27 @@
 //
 
 import UIKit
+import Alamofire
+import SDWebImage
+
 
 class GroupsController: UITableViewController {
 
+    let session = Session.shared
+    let service = Service()
     
-    var groups = [
-        Groups(image: UIImage.init(named: "Music"), name: "Music instinct"),
-        Groups(image: UIImage.init(named: "Dusha"), name: "Карандаша душа"),
-        Groups(image: UIImage.init(named: "Radio"), name: "Radio Modern"),
-        Groups(image: UIImage.init(named: "343"), name: "343 Records"),
-        Groups(image: UIImage.init(named: "Kultura"), name: "Своя Культура")
-    ]
+    var groups = [Group]()
         
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        service.getGroups(token: session.token) {
+            groups in
+            self.groups = groups
+            self.tableView.reloadData()
+        }
+        
+    }
 
     // MARK: - Table view data source
 
@@ -37,24 +46,28 @@ class GroupsController: UITableViewController {
             preconditionFailure("Group cell can not")
         }
 
-        cell.labelGroupsCell.text = groups[indexPath.row].name
-        cell.imageGroupsCell.image = groups[indexPath.row].image
+        let group = groups[indexPath.row]
+        cell.labelGroupsCell.text = group.name
+        
+        if let photo = group.photo{
+            cell.imageGroupsCell.sd_setImage(with: URL(string: photo))
+        }
       
         return cell
     }
     
-    @IBAction func addSelectedGroup(segue: UIStoryboardSegue) {
-        if let sourceVC = segue.source as? AllGroupsController,
-           let indexPath = sourceVC.tableView.indexPathForSelectedRow {
-            let group = sourceVC.filteredGroups[indexPath.row]
-            
-            if !groups.contains(where: {$0.name == group.name}) {
-                groups.append(group)
-                
-                tableView.reloadData()
-            }
-        }
-    }
+//    @IBAction func addSelectedGroup(segue: UIStoryboardSegue) {
+//        if let sourceVC = segue.source as? AllGroupsController,
+//           let indexPath = sourceVC.tableView.indexPathForSelectedRow {
+//            let group = sourceVC.filteredGroups[indexPath.row]
+//
+//            if !groups.contains(where: {$0.name == group.name}) {
+//                groups.append(group)
+//
+//                tableView.reloadData()
+//            }
+//        }
+//    }
     
     
     
@@ -106,3 +119,42 @@ class GroupsController: UITableViewController {
     */
 
 }
+
+
+
+//extension GroupsController {
+//    
+//    func getGroups() {
+//        
+//        var urlComponents = URLComponents()
+//        urlComponents.scheme = "https"
+//        urlComponents.host = "api.vk.com"
+//        urlComponents.path = "/method/groups.get"
+//        urlComponents.queryItems = [
+//            URLQueryItem(name: "user_id", value: String(Session.shared.userID)),
+//            URLQueryItem(name: "access_token", value: Session.shared.token),
+//            URLQueryItem(name: "v", value: "5.131")
+//        ]
+//        
+//        guard let url = urlComponents.url else { return }
+//        
+//        let request = URLRequest(url: url)
+//        
+//        URLSession.shared.dataTask(with: request) { data, response, error in
+//            if let error = error {
+//                print(error)
+//            }
+//            guard let data = data else {
+//                return
+//            }
+//            do {
+//                let result = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+//                print("=======================")
+//                print(result)
+//                print("=======================")
+//            } catch {
+//                print(error)
+//            }
+//        }.resume()
+//    }
+//}
